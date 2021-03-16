@@ -66,12 +66,71 @@ def initialization(cursor):
                          PRIMARY KEY (employeeID, name))''',
                       '''INSERT INTO employees
                         VALUES (%s, %s, %s, %s, %s, %s)''')
-
-    path = '/Users/gabrielemarinosci/Desktop/Database/ass2/companies - Foglio1.csv'
+            
+    path = r"C:\Users\foxra\Desktop\Courses\Database\db_assignment3\companies - Foglio1.csv"
     create_table(cursor, 'companies', path, companies_table)
-    path = '/Users/gabrielemarinosci/Desktop/Database/ass2/games - Foglio1.csv'
+    path = r"C:\Users\foxra\Desktop\Courses\Database\db_assignment3\games - Foglio1.csv"
     create_table(cursor, 'games', path, games_table)
-    path = '/Users/gabrielemarinosci/Desktop/Database/ass2/departments - Foglio1.csv'
+    path = r"C:\Users\foxra\Desktop\Courses\Database\db_assignment3\departments - Foglio1.csv"
     create_table(cursor, 'departments', path, dep_table)
-    path = '/Users/gabrielemarinosci/Desktop/Database/ass2/employees - Foglio1.csv'
+    path = r"C:\Users\foxra\Desktop\Courses\Database\db_assignment3\employees - Foglio1.csv"
     create_table(cursor, 'employees', path, employee_table)
+
+def company_ceo(cursor):
+    company = input("Enter the name of the company: ")
+    query = (f"SELECT ceo FROM companies WHERE name = '{company}'") 
+    cursor.execute(query)
+    for i in cursor:
+        print(i[0])
+
+def age_difference_between_different_departments(cursor):
+    department_one = input("Enter the name of the first department(Programming, Graphic-design, Management) ")
+    department_two = input("Enter the name of the second department(Programming, Graphic-design, Management) ")
+    query1 = (f"SELECT AVG(age) FROM employees WHERE department = '{department_one}'") 
+    query2 = (f"SELECT AVG(age) FROM employees WHERE department = '{department_two}'")
+    cursor.execute(query1)
+    average1 = cursor.fetchone()
+    cursor.execute(query2)
+    average2= cursor.fetchone()
+
+    if average1 > average2:
+        print("Average age of", department_one, "department employees larger then ", department_two,"department")
+    elif average1 == average2:
+        print("Invalid input, you chose the same departments")
+    else: 
+        print("Average age of", department_two, "department employees larger then", department_one,"department")
+
+def view_with_games(cursor):
+    if checkTableExists(cursor, "title_and_genre") == True:
+        exit
+    elif checkTableExists(cursor, "title_and_genre") == False:
+        query = (f"CREATE VIEW title_and_genre AS SELECT title, genre FROM games ")
+        cursor.execute(query)
+    query_for_view = (f"SELECT * FROM title_and_genre")
+    cursor.execute(query_for_view)
+    for i in cursor:
+        print("Title:",i[0],", Genre:", i[1])
+
+def checkTableExists(cursor, tablename): #source https://stackoverflow.com/questions/17044259/python-how-to-check-if-table-exists
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM information_schema.tables
+        WHERE table_name = '{0}'
+        """.format(tablename.replace('\'', '\'\'')))
+    if cursor.fetchone()[0] == 1:
+        return True
+
+    return False
+
+
+def ceo_of_the_company_who_made_game(cursor):
+    query = (f"SELECT title FROM games ") 
+    print("List with games: ")
+    cursor.execute(query)
+    for i in cursor:
+        print(i[0])
+    game = input("Enter name of the game: ")
+    query = (f"SELECT ceo FROM companies INNER JOIN games ON games.company = companies.name WHERE title = '{game}'")
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    print("Name of the company's CEO who made", game,"is",result)   
