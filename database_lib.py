@@ -134,3 +134,41 @@ def ceo_of_the_company_who_made_game(cursor):
     cursor.execute(query)
     result = cursor.fetchone()[0]
     print("Name of the company's CEO who made", game,"is",result)   
+
+
+def employees_who_made_the_game(cursor):
+    query = (f"SELECT title FROM games ") 
+    print("List with games: ")
+    cursor.execute(query)
+    for i in cursor:
+        print(i[0])
+    game = input("Enter name of the game: ")
+    department = input("Enter interested department(Programming, Graphic-design, Management or All in case if you need all employees): ")
+    if department == "All":
+        query = (f"""SELECT employees.name FROM employees  
+                     INNER JOIN games ON games.company = employees.company WHERE title = '{game}'""")
+        cursor.execute(query)
+        for i in cursor:
+            print(i[0])
+    else:
+        query = (f"""SELECT employees.name FROM employees  
+                     INNER JOIN games ON games.company = employees.company WHERE title = '{game}' AND department = '{department}'""")
+        cursor.execute(query)
+        for i in cursor:
+            print(i[0])
+
+
+def companies_group_by_number_of_employees(cursor):
+    query = (f"SELECT name, total_employees FROM companies ORDER BY total_employees")
+    cursor.execute(query)
+    for i in cursor:
+        print("Company:",i[0], "|  Total employees:",i[1])
+
+def heads_of_company_departments(cursor):
+    company = input("Enter name of the company(Blizzard, Valve, Ubisoft, CD projekt RED): ")
+    query = (f"SELECT name, head_department FROM departments WHERE company = '{company}'")
+    cursor.execute(query)
+    print("Heads_of_departments:")
+    for i in cursor:
+        print("Department:",i[0], end=" ")
+        print("Name:",i[1])
