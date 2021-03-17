@@ -170,5 +170,5 @@ def heads_of_company_departments(cursor):
     cursor.execute(query)
     print("Heads_of_departments:")
     for i in cursor:
-        print("Department:",i[0], end=" ")
+        print("Department:",i[0], end=" | ")
         print("Name:",i[1])
